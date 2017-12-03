@@ -29,9 +29,9 @@ import java.util.ArrayList;
 public class RetrieveActivity extends AppCompatActivity {
 
     private ListView listRetrieveText;
+
     private ArrayList<String> name;
     private ArrayList<String> age;
-
     private retrieveTextAdapter retrieveTextAdapter;
 
     @Override
@@ -39,10 +39,11 @@ public class RetrieveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retrieve);
 
+        listRetrieveText = (ListView) findViewById(R.id.listView);
+
         name = new ArrayList<>();
         age = new ArrayList<>();
 
-        listRetrieveText = (ListView) findViewById(R.id.listView);
         retrieveTextAdapter = new retrieveTextAdapter(RetrieveActivity.this, name, age);
         listRetrieveText.setAdapter(retrieveTextAdapter);
 
@@ -52,60 +53,29 @@ public class RetrieveActivity extends AppCompatActivity {
     private class AsyncRetrieve extends AsyncTask<String, String, String> {
         HttpURLConnection connection;
         URL url = null;
-
         @Override
         protected void onPreExecute() {
 
         }
-
         @Override
         protected String doInBackground(String... params) {
-
             try {
-                url = new URL("http://192.168.1.106/php/retrieveText.php");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return "exception";
-            }
-
-            try {
+                url = new URL("YOUR-URL");
                 connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
 
-                connection.setDoOutput(true);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder result = new StringBuilder();
 
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+                return (result.toString());
             } catch (IOException e) {
                 e.printStackTrace();
                 return "exception";
-            }
-
-
-            try {
-                int response_code = connection.getResponseCode();
-
-                if (response_code == HttpURLConnection.HTTP_OK) {
-
-                    InputStream input = connection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
-                    StringBuilder result = new StringBuilder();
-                    String line;
-
-                    while ((line = reader.readLine()) != null) {
-                        result.append(line);
-                    }
-                    return (result.toString());
-                } else {
-                    return "unsuccessful";
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            } finally {
-                connection.disconnect();
             }
         }
-
         @Override
         protected void onPostExecute(String result) {
         //    Toast.makeText(RetrieveActivity.this, result, Toast.LENGTH_SHORT).show();
@@ -115,8 +85,6 @@ public class RetrieveActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
-
         private void showLIST(String json) throws JSONException{
             JSONObject obj = null;
             JSONArray jsonArray = new JSONArray(json);

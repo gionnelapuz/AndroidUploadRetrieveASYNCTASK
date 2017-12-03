@@ -32,10 +32,7 @@ public class UploadActivity extends AppCompatActivity {
 
         txtName = (EditText) findViewById(R.id.txtName);
         txtAge = (EditText) findViewById(R.id.txtAge);
-
         btnUpload = (Button) findViewById(R.id.btnUpload);
-
-
 
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,35 +40,26 @@ public class UploadActivity extends AppCompatActivity {
                 final String name = txtName.getText().toString();
                 final String age = txtAge.getText().toString();
 
-                new AsyncLogin().execute(name,age);
+                new AsyncUpload().execute(name,age);
             }
         });
     }
 
-    private class AsyncLogin extends AsyncTask<String, String, String>
+    private class AsyncUpload extends AsyncTask<String, String, String>
     {
         HttpURLConnection connection;
         URL url = null;
-
         @Override
         protected void onPreExecute(){
 
         }
         @Override
         protected String doInBackground(String... params) {
-
             try {
-                url = new URL("http://192.168.1.106/php/insertText.php");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return "exception";
-            }
+                url = new URL("YOUR-URL");
 
-            try {
                 connection = (HttpURLConnection)url.openConnection();
                 connection.setRequestMethod("POST");
-
-                connection.setDoInput(true);
 
                 Uri.Builder builder = new Uri.Builder()
                         .appendQueryParameter("name", params[0])
@@ -85,47 +73,23 @@ public class UploadActivity extends AppCompatActivity {
                 writer.flush();
                 writer.close();
                 os.close();
-                connection.connect();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return  "exception";
-            }
 
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder result = new StringBuilder();
 
-            try
-            {
-                int response_code = connection.getResponseCode();
-
-                if (response_code == HttpURLConnection.HTTP_OK){
-
-                    InputStream input = connection.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-
-                    StringBuilder result = new StringBuilder();
-                    String line;
-
-                    while ((line = reader.readLine()) != null){
-                        result.append(line);
-                    }
-                    return (result.toString());
-                }else{
-                    return "unsuccessful";
+                String line;
+                while ((line = reader.readLine()) != null){
+                    result.append(line);
                 }
+                return (result.toString());
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
-                connection.disconnect();
+                return "exception";
             }
-
-            return null;
         }
-
         @Override
         protected void onPostExecute(String result){
-
             Toast.makeText(UploadActivity.this, result, Toast.LENGTH_SHORT).show();
-
         }
     }
-
 }
