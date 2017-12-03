@@ -11,10 +11,6 @@ import com.example.gin.httpurluploadretrieve.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by Gin on 12/3/2017.
- */
-
 public class retrieveTextAdapter extends BaseAdapter{
 
     private Context context;
